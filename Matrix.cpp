@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstring> //todo - for memcpy
 #include "Matrix.h"
 #define DEFAULT_ROWS_SIZE 1
 #define DEFAULT_COLS_SIZE 1
@@ -61,20 +62,38 @@ int Matrix::get_cols () const
 
 Matrix &Matrix::transpose () //todo add &?
 {
-  float *new_data = new float[_rows * _cols];
+  Matrix temp_m(*this);
   for (int j=0; j < _cols; j++)
   {
     for (int i = 0; i < _rows; i++)
     {
-      new_data[j * _rows + i] = (*this) (i, j);
+      _data[j * _rows + i] = temp_m(i, j);
     }
   }
   int temp_rows = _rows;
   _rows = _cols;
   _cols = temp_rows;
-  delete[] _data;
-  _data = new_data;
+  delete[] temp_m._data;
+  return *this;
 }
+
+
+//Matrix &Matrix::transpose () //todo add &?
+//{
+//  float *new_data = new float[_rows * _cols];
+//  for (int j=0; j < _cols; j++)
+//  {
+//    for (int i = 0; i < _rows; i++)
+//    {
+//      new_data[j * _rows + i] = (*this) (i, j);
+//    }
+//  }
+//  int temp_rows = _rows;
+//  _rows = _cols;
+//  _cols = temp_rows;
+//  delete[] _data;
+//  _data = new_data;
+//}
 
 Matrix &Matrix::vectorize ()
 {
@@ -101,10 +120,11 @@ Matrix Matrix::dot (const Matrix &m) const
   {
     throw std::invalid_argument ("Matrix dimensions must match for dot product.");
   }
-  Matrix new_m(_rows, _cols);
+//  Matrix new_m(_rows, _cols);
+  Matrix new_m(*this);
   for (int i = 0; i < _rows * _cols; i++)
   {
-    new_m._data[i] = _data[i] * m._data[i];
+    new_m._data[i] *= m._data[i];
   }
   return new_m;
 }
@@ -121,46 +141,46 @@ float Matrix::norm () const
 
 //helper
 // פונקציה להחלפת שורות
-void swapRows (int row1, int row2)
+void swapRows (Matrix& m, int row1, int row2)
 {
-  for (int col = 0; col < _cols; ++col)
+  for (int col = 0; col < m.get_cols(); ++col)
   {
-    std::swap ((*this) (row1, col), (*this) (row2, col));
+    std::swap (m (row1, col), m (row2, col));
   }
 }
 
 //helper
 // פונקציה לחילוק שורה במספר מסוים
-void Matrix::divideRow (int row, float divisor)
+void divideRow (Matrix& m, int row, float divisor)
 {
-  for (int col = 0; col < _cols; ++col)
+  for (int col = 0; col < m.get_cols(); ++col)
   {
-    (*this) (row, col) /= divisor;
+    m(row, col) /= divisor;
   }
 }
 
 //helper
 // פונקציה לחיסור שורות
-void Matrix::subtractRows (int targetRow, int sourceRow, float multiplier)
+void subtractRows (Matrix& m, int targetRow, int sourceRow, float multiplier)
 {
-  for (int col = 0; col < _cols; ++col)
+  for (int col = 0; col < m.get_cols(); ++col)
   {
-    (*this) (targetRow, col) -= multiplier * (*this) (sourceRow, col);
+    m (targetRow, col) -= multiplier * m (sourceRow, col);
   }
 }
 
 // מימוש rref בעזרת פונקציות העזר
 Matrix Matrix::rref () const
 {
-  Matrix rref (*this);
+  Matrix rref_m (*this);     //todo -call copy constructor?
   int lead = 0;
   for (int row = 0; row < _rows; ++row)
   {
     if (lead >= _cols)
-      return rref;
+      return rref_m;
 
     int i = row;
-    while (rref (i, lead) == 0)
+    while (rref_m (i, lead) == 0)
     {
       ++i;
       if (i == _rows)
@@ -168,27 +188,27 @@ Matrix Matrix::rref () const
         i = row;
         ++lead;
         if (lead == _cols)
-          return rref;
+          return rref_m;
       }
     }
 
-    rref.swapRows (i, row);
+    swapRows (rref_m, i, row);
 
-    if (rref (row, lead) != 0)
+    if (rref_m (row, lead) != 0)
     {
-      rref.divideRow (row, rref (row, lead));
+      divideRow (rref_m, row, rref_m (row, lead));
     }
 
     for (int i = 0; i < _rows; ++i)
     {
       if (i != row)
       {
-        rref.subtractRows (i, row, rref (i, lead));
+        subtractRows (rref_m, i, row, rref_m (i, lead));
       }
     }
     ++lead;
   }
-  return rref;
+  return rref_m;
 }
 
 int Matrix::argmax () const
@@ -219,7 +239,7 @@ float Matrix::sum () const
 }
 
 //operators:
-Matrix::Matrix& operator+= (const Matrix &m) //todo - validate cols==m_cols
+Matrix& Matrix::operator+= (const Matrix &m) //todo - validate cols==m_cols
 {
   if (_rows != m._rows || _cols != m._cols)
   {
@@ -232,7 +252,7 @@ Matrix::Matrix& operator+= (const Matrix &m) //todo - validate cols==m_cols
   return *this;
 }
 
-Matrix::Matrix operator+(const Matrix &m) const
+Matrix Matrix::operator+(const Matrix &m) const
 {
   if (_rows != m._rows || _cols != m._cols)
   {
@@ -243,32 +263,32 @@ Matrix::Matrix operator+(const Matrix &m) const
   return new_m;
 }
 
-Matrix::Matrix& operator=(const Matrix &m)
+Matrix& Matrix::operator=(const Matrix &m)
 {
   if (this == &m)
   {
     return *this;
   }
   delete[] _data;
-  _rows = m.rows;
+  _rows = m._rows;
   _cols = m._cols;
   _data = new float[_rows*_cols];
   std::memcpy(_data, m._data, _rows * _cols * sizeof(float));
   return *this;
 }
 
-Matrix::Matrix operator*(const Matrix &m) const
+Matrix Matrix::operator*(const Matrix &m) const
 {
   if (_cols != m._rows)
   {
     throw std::invalid_argument("Matrix dimensions must agree for multiplication.");
   }
   Matrix new_m(_rows, m._cols);
-  for (int i = 0; i < rows; ++i)
+  for (int i = 0; i < _rows; ++i)
   {
-    for (int j = 0; j < m.cols; ++j)
+    for (int j = 0; j < m._cols; ++j)
     {
-      for (int k = 0; k < cols; ++k)
+      for (int k = 0; k < _cols; ++k)
       {
         new_m(i, j) += (*this)(i, k) * m(k, j);
       }
@@ -277,12 +297,30 @@ Matrix::Matrix operator*(const Matrix &m) const
   return new_m;
 }
 
-Matrix::Matrix operator*(float scalar) const
+Matrix Matrix::operator*(float scalar) const
 {
-  const Matrix new_m(_rows, _cols);
+  Matrix new_m(*this);
   for (int i=0; i<_rows*_cols; i++)
   {
-    new_m._data[i] = _data[i]*scalar;
+    new_m._data[i] = _data[i]*scalar; //todo
   }
-  return const new_m;
+  return new_m;
 }
+
+
+// Operator * (scalar) friend
+Matrix operator*(float scalar, const Matrix &m)
+{
+  return m * scalar;
+}
+
+float& Matrix::operator()(int row, int col)
+{
+  if (row<0 || col<0 || _rows <row || _cols<col)
+  {
+    throw std::invalid_argument ("col or row not matching the Matrix dimensions ");
+  }
+  return _data[row*_cols+ col];
+}
+
+//float operator()(int row, int col) const;
