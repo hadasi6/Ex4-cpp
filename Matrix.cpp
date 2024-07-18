@@ -22,16 +22,16 @@ Matrix::Matrix ()
 
 
 Matrix::Matrix (int rows, int cols)
-: _rows(rows), _cols(cols), _data(new float[_rows * _cols])
+: _rows(rows), _cols(cols), _data(new float[1])
 {
+
   if (rows <= 0 || cols <= 0)
   {
     std::cerr << "Invalid matrix dimensions" << std::endl; //todo
     throw std::runtime_error ("Matrix dimensions must be positive"); //todo
   }
-//  _rows = rows;
-//  _cols = cols;
-//  _data = new float[_rows * _cols];
+  delete[] _data;
+  _data = new float[_rows * _cols];
   for (int i = 0; i < _rows * _cols; i++)
   {
     _data[i] = DEFAULT_ELEMENT;
