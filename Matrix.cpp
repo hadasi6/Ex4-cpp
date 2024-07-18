@@ -22,7 +22,7 @@ Matrix::Matrix ()
 
 
 Matrix::Matrix (int rows, int cols)
-: _rows(DEFAULT_ROWS_SIZE), _cols(DEFAULT_COLS_SIZE), _data(new float[_rows * _cols])
+: _rows(rows), _cols(cols), _data(new float[_rows * _cols])
 {
   if (rows <= 0 || cols <= 0)
   {
@@ -77,7 +77,7 @@ Matrix &Matrix::transpose () //todo add &?
   int temp_rows = _rows;
   _rows = _cols;
   _cols = temp_rows;
-  delete[] temp_m._data;
+//  delete[] temp_m._data;
   return *this;
 }
 
@@ -153,37 +153,39 @@ float Matrix::norm () const
 
 //helper
 // פונקציה להחלפת שורות
-void swapRows (Matrix& m, int row1, int row2)
+void Matrix::_swapRows(int row1, int row2)
 {
-  for (int col = 0; col < m.get_cols(); ++col)
+  for (int col = 0; col < _cols; ++col)
   {
-    float temp = m[row1*m.get_cols()+ col];
-    m[row1* m.get_cols()+ col]= m(row2, col);
-    m[row2*m.get_cols()+col] = temp;
+    float temp = _data[row1*_cols+ col];
+    (*this)[row1* _cols+ col]= (*this)(row2, col);
+    (*this)[row2*_cols+col] = temp;
 //    swap(m(row1, col), m(row2, col)); //todo - changed into 3 lines ^
   }
 }
 
 //helper
 // פונקציה לחילוק שורה במספר מסוים
-void divideRow (Matrix& m, int row, float divisor)
+void Matrix::_divideRow(int row, float divisor)
 {
-  for (int col = 0; col < m.get_cols(); ++col)
+  for (int col = 0; col < _cols; ++col)
   {
     //    m(row, col) = divisor;
-    m[row*m.get_cols()+col] = m(row, col)/divisor; //todo -changed from^
+    (*this)[row*_cols+col] = (*this)(row, col)/divisor; //todo -changed from^
 
   }
 }
 
 //helper
 // פונקציה לחיסור שורות
-void subtractRows (Matrix& m, int targetRow, int sourceRow, float multiplier)
+void Matrix::_subtractRows(int targetRow, int sourceRow, float
+multiplier)
 {
-  for (int col = 0; col < m.get_cols(); ++col)
+  for (int col = 0; col < _cols; ++col)
   {
-    m[targetRow*m.get_cols()+col] = m (targetRow, col)-m (sourceRow, col);
-//    m (targetRow, col) -= multiplier * m (sourceRow, col); //todo - changed^
+    (*this)[targetRow*_cols+col] = (*this)(targetRow, col)-(*this)(sourceRow,
+                                                                col);
+//    (*this)(targetRow, col) -= multiplier * (*this)(sourceRow, col); //todo -changed^
   }
 }
 
@@ -210,18 +212,18 @@ Matrix Matrix::rref () const
       }
     }
 
-    swapRows (rref_m, i, row);
+    rref_m._swapRows (i, row);
 
     if (rref_m (row, lead) != 0)
     {
-      divideRow (rref_m, row, rref_m (row, lead));
+      rref_m._divideRow (row, rref_m (row, lead));
     }
 
     for (int index = 0; i < _rows; ++i)
     {
       if (index != row)
       {
-        subtractRows (rref_m, index, row, rref_m (index, lead));
+        rref_m._subtractRows(index, row, rref_m (index, lead));
       }
     }
     ++lead;
@@ -333,7 +335,7 @@ Matrix operator*(float scalar, const Matrix &m)
   return m * scalar;
 }
 
-float Matrix::operator()(int row, int col)  //todo - i added const retur
+float& Matrix::operator()(int row, int col)  //todo - i added const retur
 {
   if (row<0 || col<0 ||  _rows <row || _cols<col) //todo - use get?
   {
