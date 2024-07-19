@@ -412,6 +412,31 @@ std::ostream& operator<<(std::ostream &out, const Matrix &m)
   return out;
 }
 
+std::istream& operator>>(std::istream &in, Matrix &m)
+{
+  size_t array_size_bytes = m.get_rows() * m.get_cols() * sizeof(float);
+  char* stream_in = new char[array_size_bytes];
+  in.read(stream_in, array_size_bytes);
+  if (static_cast<size_t>(in.gcount()) != array_size_bytes)
+  {
+    delete[] stream_in;
+    throw std::runtime_error("Error: Input stream does not have enough data to fill the matrix.");
+  }
+  int stream_i = 0;
+  for (int i = 0; i < m.get_rows(); i++)
+  {
+    for (int j = 0; j < m.get_cols(); j++)
+    {
+      float val;
+      memcpy(&val, &stream_in[stream_i], sizeof(float));
+      m(i, j) = val;
+      stream_i += sizeof(float);
+    }
+  }
+  // clean buffer
+  delete[] stream_in;
+  return in;
+}
 
 //int _read_file_to_array(std::istream &is, float arr[], int n)
 //{
