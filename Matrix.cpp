@@ -6,6 +6,15 @@
 #define DEFAULT_COLS_SIZE 1
 #define ONE_COL 1
 #define DEFAULT_ELEMENT 0
+#define LIMIT 0.1
+
+enum EnumBinaryReadResult {
+    BINARY_READ_SUCCESS = 0,
+    BINARY_OPEN_FAILURE,
+    BINARY_FILE_SIZE_FAILURE,
+    BINARY_READ_FAILURE
+};
+
 
 Matrix::Matrix ()
 : Matrix (DEFAULT_ROWS_SIZE, DEFAULT_COLS_SIZE)
@@ -135,7 +144,7 @@ Matrix Matrix::dot (const Matrix &m) const
 
 float Matrix::norm () const
 {
-  float elemnt_sum = 0.0f;  //todo -0 ?
+  float elemnt_sum = 0;  //todo -0 ?
   for (int i = 0; i < _rows * _cols; i++)
   {
     elemnt_sum += _data[i] * _data[i];
@@ -197,7 +206,9 @@ Matrix Matrix::rref () const
   for (int row = 0; row < _rows; ++row)
   {
     if (lead >= _cols)
+    {
       return rref_m;
+    }
 
     int i = row;
     while (rref_m (i, lead) == 0)
@@ -208,7 +219,9 @@ Matrix Matrix::rref () const
         i = row;
         ++lead;
         if (lead == _cols)
+        {
           return rref_m;
+        }
       }
     }
 
@@ -337,7 +350,8 @@ Matrix operator*(float scalar, const Matrix &m)
 
 float& Matrix::operator()(int row, int col)  //todo - i added const retur
 {
-  if (row<0 || col<0 ||  _rows <row || _cols<col) //todo - use get?
+
+  if (row<0 || col<0 ||  _rows <row || _cols < col) //todo - use get?
   {
     throw std::out_of_range("Matrix subscript out of bounds.");
   }
@@ -357,7 +371,7 @@ float Matrix::operator()(int row, int col) const
 
 float& Matrix::operator[](int index)
 {
-  if (index<0 || index> this->get_cols()* this->get_rows())
+  if (index < 0 || index > _rows*_cols)
 //  if (index<0 || index> _rows*_cols) //todo - validate
   {
     throw std::out_of_range("Matrix subscript out of bounds.");
@@ -381,7 +395,7 @@ std::ostream& operator<<(std::ostream &out, const Matrix &m)
   {
     for (int j = 0; j < m._cols; ++j)
     {
-      if (m(i, j) > 0.1)
+      if (m(i, j) > LIMIT)
       {
         out << m(i, j) << "**";
       }
@@ -396,15 +410,26 @@ std::ostream& operator<<(std::ostream &out, const Matrix &m)
 }
 
 
-std::istream& operator>>(std::istream &in, Matrix &m)
-{
-  for (int i = 0; i < m._rows * m._cols; ++i) //todo - האם זו הכוונה?
-
-  {
-    if (!(in >> m._data[i]))
-    {
-      throw std::runtime_error("Error: Input stream does not have enough data to fill the matrix.");
-    }
-  }
-  return in;
-}
+//int _read_file_to_array(std::istream &is, float arr[], int n)
+//{
+//
+//  long int array_size_bytes = n * sizeof(float );
+//  is.seekg(0, std::ios_base::end);
+//  long file_size_bytes = (char)is.tellg ();
+//  if (file_size_bytes != array_size_bytes)
+//  {
+//    return BINARY_FILE_SIZE_FAILURE;
+//  }
+//  is.seekg (0, std::ios_base::beg);
+//  // advanced note: interpret_cast could be used here instead of (char*) but we didn't study it in class
+//  if (!is.read ((char *) arr, array_size_bytes))
+//  {
+//    return BINARY_READ_FAILURE;
+//  }
+////  is.close ();
+//  if (!is)
+//  {
+//    return BINARY_READ_FAILURE;
+//  }
+//  return BINARY_READ_SUCCESS;
+//}
