@@ -2,6 +2,9 @@
 #include <cstring> //todo - for memcpy
 #include "Matrix.h"
 #include <algorithm>
+#include <iostream>
+#include <stdexcept> //todo -relevant?
+
 #define DEFAULT_ROWS_SIZE 1
 #define DEFAULT_COLS_SIZE 1
 #define ONE_COL 1
@@ -426,7 +429,7 @@ std::ostream& operator<<(std::ostream &out, const Matrix &m)
 //  {
 //    return BINARY_READ_FAILURE;
 //  }
-////  is.close ();
+//  is.close ();
 //  if (!is)
 //  {
 //    return BINARY_READ_FAILURE;
