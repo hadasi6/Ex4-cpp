@@ -192,8 +192,8 @@ multiplier)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    (*this)[targetRow*_cols+col] = (*this)(targetRow, col)-(*this)(sourceRow,
-                                                                col);
+    (*this)[targetRow*_cols+col] = (*this)(targetRow, col)-multiplier*
+                                      (*this)(sourceRow, col);
 //    (*this)(targetRow, col) -= multiplier * (*this)(sourceRow, col); //todo -changed^
   }
 }
