@@ -10,7 +10,17 @@ Dense::Dense(const Matrix &weights, const Matrix &bias,
               _bias(bias),
               _activation_func(activation_func)
 {
-  //todo -add
+  if (weights.get_rows() != bias.get_rows())
+  {
+    throw std::out_of_range("Matrix subscript out of bounds.");
+  }
+  if (bias.get_cols() != 1)
+  {
+    throw std::out_of_range("Matrix subscript out of bounds."); //todo-change
+  }
+  _weights = weights;
+  _bias = bias;
+  _activation_func = activation_func;
 }
 
 Matrix Dense::get_weights() const

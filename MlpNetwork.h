@@ -36,7 +36,7 @@ class MlpNetwork{
   Matrix _biases[MLP_SIZE];
  public:
   MlpNetwork(const Matrix weights[MLP_SIZE], const Matrix biases[MLP_SIZE]);
-  digit operator()(const Matrix& img);
+  digit operator()(const Matrix& img) const;
 };
 
 #endif // MLPNETWORK_H

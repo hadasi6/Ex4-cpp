@@ -12,7 +12,7 @@ MlpNetwork::MlpNetwork (const Matrix *weights, const Matrix *biases)
   }
 }
 
-digit MlpNetwork::operator()(const Matrix& img)
+digit MlpNetwork::operator()(const Matrix& img) const
 {
   Matrix output=img;
   for (int i=0; i<MLP_SIZE-1; i++)
