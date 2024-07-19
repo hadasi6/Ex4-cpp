@@ -5,12 +5,13 @@
 #include "Dense.h"
 
 Dense::Dense(const Matrix &weights, const Matrix &bias,
-             activation::ActivationFunction
-              activation_func):
+             ActivationFunction activation_func):
               _weights(weights),
               _bias(bias),
               _activation_func(activation_func)
-{}
+{
+  //todo -add
+}
 
 Matrix Dense::get_weights() const
 {
@@ -22,7 +23,7 @@ Matrix Dense::get_bias() const
   return _bias;
 }
 
-activation::ActivationFunction Dense::get_activation(const Matrix&) const
+ActivationFunction Dense::get_activation() const
 {
   return _activation_func;
 }

@@ -162,7 +162,7 @@ float Matrix::norm () const
 
 //helper
 // פונקציה להחלפת שורות
-void Matrix::_swapRows(int row1, int row2)
+void Matrix::swapRows(int row1, int row2)
 {
   for (int col = 0; col < _cols; ++col)
   {
@@ -175,7 +175,7 @@ void Matrix::_swapRows(int row1, int row2)
 
 //helper
 // פונקציה לחילוק שורה במספר מסוים
-void Matrix::_divideRow(int row, float divisor)
+void Matrix::divideRow(int row, float divisor)
 {
   for (int col = 0; col < _cols; ++col)
   {
@@ -187,7 +187,7 @@ void Matrix::_divideRow(int row, float divisor)
 
 //helper
 // פונקציה לחיסור שורות
-void Matrix::_subtractRows(int targetRow, int sourceRow, float
+void Matrix::subtractRows(int targetRow, int sourceRow, float
 multiplier)
 {
   for (int col = 0; col < _cols; ++col)
@@ -225,18 +225,18 @@ Matrix Matrix::rref () const
       }
     }
 
-    rref_m._swapRows (i, row);
+    rref_m.swapRows (i, row);
 
     if (rref_m (row, lead) != 0)
     {
-      rref_m._divideRow (row, rref_m (row, lead));
+      rref_m.divideRow (row, rref_m (row, lead));
     }
 
     for (int index = 0; i < _rows; ++i)
     {
       if (index != row)
       {
-        rref_m._subtractRows(index, row, rref_m (index, lead));
+        rref_m.subtractRows(index, row, rref_m (index, lead));
       }
     }
     ++lead;

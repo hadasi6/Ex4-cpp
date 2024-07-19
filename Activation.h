@@ -6,10 +6,12 @@
 
 // Insert Activation namespace here...
 
+typedef Matrix (*ActivationFunction)(const Matrix&);
+
 namespace activation {
 
 // Typedef for activation function pointer
-    typedef Matrix (*ActivationFunction)(const Matrix&);
+//    typedef Matrix (*ActivationFunction)(const Matrix&);
 
 // ReLU activation function
     Matrix relu(const Matrix& m);
@@ -19,10 +21,6 @@ namespace activation {
 
 
 } // namespace activation
-
-
-
-
 
 
 

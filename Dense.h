@@ -10,25 +10,20 @@ class Dense{
  private:
   Matrix _weights;
   Matrix _bias;
-  activation::ActivationFunction _activation_func;
+  ActivationFunction _activation_func;
+//  activation::ActivationFunction _activation_func;
+
 //  Matrix (*activation)(const Matrix &);
  public:
   Dense(const Matrix& weights, const Matrix& bias,
-        activation::ActivationFunction activation_func);
+        ActivationFunction activation_func);
   Matrix get_weights() const;
   Matrix get_bias() const;
-  activation::ActivationFunction get_activation(const Matrix&) const;
+  ActivationFunction get_activation() const; //todo - changed
 
 //  Matrix operator()(const Matrix w, const Matrix b, Matrix activation);
   Matrix operator()(const Matrix& m) const;
 };
-
-
-
-
-
-
-
 
 
 

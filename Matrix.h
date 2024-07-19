@@ -21,9 +21,9 @@ class Matrix
   int _rows, _cols;
   float* _data;
 
-  void _swapRows(int row1, int row2);
-  void _divideRow (int row, float divisor);
-  void _subtractRows(int targetRow, int sourceRow, float multiplier);
+  void swapRows(int row1, int row2);
+  void divideRow (int row, float divisor);
+  void subtractRows(int targetRow, int sourceRow, float multiplier);
 //  int _read_file_to_array(std::istream &is, float arr[], int n);
 
  public:
