@@ -400,11 +400,13 @@ std::ostream& operator<<(std::ostream &out, const Matrix &m)
     {
       if (m(i, j) > LIMIT)
       {
-        out << m(i, j) << "**";
+        out << "**";
+//        out << m(i, j) << "**";
       }
       else
       {
-        out << m(i, j) << "  ";
+        out << " ";
+//        out << m(i, j) << "  ";
       }
     }
     out << std::endl;
