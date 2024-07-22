@@ -320,13 +320,13 @@ Matrix Matrix::operator*(const Matrix &m) const
     throw std::invalid_argument("Matrix dimensions must agree for multiplication.");
   }
   Matrix new_m(_rows, m._cols);
-  for (int i = 0; i < _rows; ++i)
+  for (int i = 0; i < new_m._rows; i++)
   {
-    for (int j = 0; j < m._cols; ++j)
+    for (int j = 0; j < new_m._cols; j++)
     {
-      for (int k = 0; k < _cols; ++k)
+      for (int k = 0; k < _cols; k++)
       {
-        new_m[i*_rows+j] += (*this)(i, k) * m(k, j);
+        new_m[i*new_m._cols+j] += (*this)(i, k) * m(k, j);
 //        new_m(i, j) += (*this)(i, k) * m(k, j); //todo -changed^
       }
     }

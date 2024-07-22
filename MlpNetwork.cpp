@@ -25,4 +25,3 @@ digit MlpNetwork::operator()(const Matrix& img) const
   float prob = output[(int)result];
   return {result, prob};
 }
-
