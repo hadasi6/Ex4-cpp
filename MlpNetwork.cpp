@@ -1,7 +1,5 @@
-//
-// Created by Owner on 18/07/2024.
-//
 #include "MlpNetwork.h"
+#define SHIFT 1
 
 MlpNetwork::MlpNetwork (const Matrix *weights, const Matrix *biases)
 {
@@ -15,11 +13,11 @@ MlpNetwork::MlpNetwork (const Matrix *weights, const Matrix *biases)
 digit MlpNetwork::operator()(const Matrix& img) const
 {
   Matrix output=img;
-  for (int i=0; i<MLP_SIZE-1; i++)
+  for (int i=0; i<MLP_SIZE-SHIFT; i++)
   {
     output=Dense(_weights[i], _biases[i], activation::relu)(output);
   }
-  output=Dense(_weights[MLP_SIZE-1], _biases[MLP_SIZE-1], activation::softmax)
+  output=Dense(_weights[MLP_SIZE-SHIFT], _biases[MLP_SIZE-SHIFT], activation::softmax)
       (output);
   unsigned int result = output.argmax();
   float prob = output[(int)result];

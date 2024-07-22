@@ -1,46 +1,39 @@
 #include <cmath>
-#include <cstring> //todo - for memcpy
+#include <cstring>
 #include "Matrix.h"
 #include <algorithm>
 #include <iostream>
-#include <stdexcept> //todo -relevant?
+#include <stdexcept>
 
 #define DEFAULT_ROWS_SIZE 1
 #define DEFAULT_COLS_SIZE 1
 #define ONE_COL 1
 #define DEFAULT_ELEMENT 0
 #define LIMIT 0.1
-
-enum EnumBinaryReadResult {
+#define OUT_OF_RANGE "Matrix dimensions must agree for addition."
+#define DIMENSIONS_MUST_MATCH "Matrix dimensions must match for dot product."
+#define CANNOT_FIND_ARGMAX "Cannot find argmax of an empty matrix."
+#define SUBSCRIPT_OUT_OF_BOUNDS "Matrix subscript out of bounds."
+#define INVALID_DATA_SIZE "Input stream doesn't have enough data to fill the matrix."
+#define INVALID_MATRIX_DIMENSIONS "Matrix dimensions must be positive."
+enum EnumBinaryReadResult
+{
     BINARY_READ_SUCCESS = 0,
     BINARY_OPEN_FAILURE,
     BINARY_FILE_SIZE_FAILURE,
     BINARY_READ_FAILURE
 };
 
-
 Matrix::Matrix ()
-: Matrix (DEFAULT_ROWS_SIZE, DEFAULT_COLS_SIZE)
-{
-//  _rows = DEFAULT_ROWS_SIZE;
-//  _cols = DEFAULT_COLS_SIZE;
-//  _data = new float[_rows * _cols]; //return Null_ptr if
-  // allocation failed
-//  for (int i = 0; i < _rows * _cols; i++)
-//  {
-//    _data[i] = DEFAULT_ELEMENT;
-//  }
-}
-
+    : Matrix (DEFAULT_ROWS_SIZE, DEFAULT_COLS_SIZE)
+{}
 
 Matrix::Matrix (int rows, int cols)
-: _rows(rows), _cols(cols), _data(new float[1])
+    : _rows (rows), _cols (cols), _data (new float[1])
 {
-
   if (rows <= 0 || cols <= 0)
   {
-    std::cerr << "Invalid matrix dimensions" << std::endl; //todo
-    throw std::runtime_error ("Matrix dimensions must be positive"); //todo
+    throw std::runtime_error (INVALID_MATRIX_DIMENSIONS);
   }
   delete[] _data;
   _data = new float[_rows * _cols];
@@ -76,40 +69,29 @@ int Matrix::get_cols () const
   return _cols;
 }
 
-Matrix &Matrix::transpose () //todo add &?
+/**
+ * Transpose the matrix
+ * @return Reference to the transposed matrix
+ */
+Matrix &Matrix::transpose ()
 {
-  Matrix temp_m(*this);
-  for (int j=0; j < _cols; j++)
+  // Allocate new memory for the transposed data
+  auto *new_data = new float[_rows * _cols];
+  // Transpose the data
+  for (int i = 0; i < _rows; ++i)
   {
-    for (int i = 0; i < _rows; i++)
+    for (int j = 0; j < _cols; ++j)
     {
-      _data[j * _rows + i] = temp_m(i, j);
+      new_data[j * _rows + i] = _data[i * _cols + j];
     }
   }
-  int temp_rows = _rows;
-  _rows = _cols;
-  _cols = temp_rows;
-//  delete[] temp_m._data;
+  // Swap the data pointers
+  delete[] _data;
+  _data = new_data;
+  // Swap the row and column counts
+  std::swap (_rows, _cols);
   return *this;
 }
-
-
-//Matrix &Matrix::transpose () //todo add &?
-//{
-//  float *new_data = new float[_rows * _cols];
-//  for (int j=0; j < _cols; j++)
-//  {
-//    for (int i = 0; i < _rows; i++)
-//    {
-//      new_data[j * _rows + i] = (*this) (i, j);
-//    }
-//  }
-//  int temp_rows = _rows;
-//  _rows = _cols;
-//  _cols = temp_rows;
-//  delete[] _data;
-//  _data = new_data;
-//}
 
 Matrix &Matrix::vectorize ()
 {
@@ -130,14 +112,19 @@ void Matrix::plain_print () const
   }
 }
 
+/**
+ * Compute the dot product of two matrices
+ * @param m Matrix to compute dot product with
+ * @return A new matrix resulting from the dot product
+ * @throw std::invalid_argument If matrix dimensions do not match
+ */
 Matrix Matrix::dot (const Matrix &m) const
 {
   if (_rows != m._rows || _cols != m._cols)
   {
-    throw std::invalid_argument ("Matrix dimensions must match for dot product.");
+    throw std::invalid_argument (DIMENSIONS_MUST_MATCH);
   }
-//  Matrix new_m(_rows, _cols);
-  Matrix new_m(*this);
+  Matrix new_m (*this);
   for (int i = 0; i < _rows * _cols; i++)
   {
     new_m._data[i] *= m._data[i];
@@ -147,7 +134,7 @@ Matrix Matrix::dot (const Matrix &m) const
 
 float Matrix::norm () const
 {
-  float elemnt_sum = 0;  //todo -0 ?
+  float elemnt_sum = 0.0;
   for (int i = 0; i < _rows * _cols; i++)
   {
     elemnt_sum += _data[i] * _data[i];
@@ -155,45 +142,62 @@ float Matrix::norm () const
   return std::sqrt (elemnt_sum);
 }
 
-
-void Matrix::swap_rows(int row1, int row2)
+/**
+ * Swap two rows in the matrix.
+ * @param row1 The first row to swap.
+ * @param row2 The second row to swap.
+ */
+void Matrix::swap_rows (int row1, int row2)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    std::swap((*this)(row1, col), (*this)(row2, col));
+    std::swap ((*this) (row1, col), (*this) (row2, col));
   }
 }
 
-void Matrix::divide_row(int row, float divisor)
+/**
+ * Divide a row by a specified divisor.
+ * @param row The row to divide.
+ * @param divisor The number by which to divide the row.
+ * @throw std::invalid_argument If divisor is zero.
+ */
+void Matrix::divide_row (int row, float divisor)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    (*this)(row, col) /= divisor;
+    (*this) (row, col) /= divisor;
   }
 }
 
-void Matrix::subtract_rows(int target_row, int source_row, float multiplier)
+/**
+ * Subtract a multiple of one row from another row.
+ * @param target_row The row to be modified.
+ * @param source_row The row to subtract.
+ * @param multiplier The multiplier to apply to the source row.
+ */
+void Matrix::subtract_rows (int target_row, int source_row, float multiplier)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    (*this)(target_row, col) -= multiplier * (*this)(source_row, col);
+    (*this) (target_row, col) -= multiplier * (*this) (source_row, col);
   }
 }
 
-
-Matrix Matrix::rref() const
+/**
+ * Compute the Reduced Row Echelon Form (RREF) of the matrix.
+ * @return A new matrix in RREF.
+ */
+Matrix Matrix::rref () const
 {
-  Matrix rref_m(*this);
+  Matrix rref_m (*this);
   int lead = 0;
   for (int row = 0; row < _rows; ++row)
   {
     if (lead >= _cols)
-    {
-      return rref_m;
-    }
+    { return rref_m; }
 
     int i = row;
-    while (rref_m(i, lead) == 0)
+    while (rref_m (i, lead) == 0.0)
     {
       ++i;
       if (i == _rows)
@@ -201,24 +205,22 @@ Matrix Matrix::rref() const
         i = row;
         ++lead;
         if (lead == _cols)
-        {
-          return rref_m;
-        }
+        { return rref_m; }
       }
     }
 
-    rref_m.swap_rows(i, row);
+    rref_m.swap_rows (i, row);
 
-    if (rref_m(row, lead) != 0)
+    if (rref_m (row, lead) != 0.0)
     {
-      rref_m.divide_row(row, rref_m(row, lead));
+      rref_m.divide_row (row, rref_m (row, lead));
     }
 
     for (int index = 0; index < _rows; ++index)
     {
       if (index != row)
       {
-        rref_m.subtract_rows(index, row, rref_m(index, lead));
+        rref_m.subtract_rows (index, row, rref_m (index, lead));
       }
     }
     ++lead;
@@ -226,105 +228,16 @@ Matrix Matrix::rref() const
   return rref_m;
 }
 
-
-//void swap (float& a,float& b)
-//{
-//  float temp = a;
-//  a=b;
-//  b=temp;
-//}
-//*****************
-//helper
-// פונקציה להחלפת שורות
-//void Matrix::swap_rows(int row1, int row2)
-//{
-//  for (int col = 0; col < _cols; ++col)
-//  {
-//    float temp = _data[row1*_cols+ col];
-//    (*this)[row1* _cols+ col]= (*this)(row2, col);
-//    (*this)[row2*_cols+col] = temp;
-////    swap(m(row1, col), m(row2, col)); //todo - changed into 3 lines ^
-//  }
-//}
-//
-////helper
-//// פונקציה לחילוק שורה במספר מסוים
-//void Matrix::divide_row(int row, float divisor)
-//{
-//  for (int col = 0; col < _cols; ++col)
-//  {
-//    //    m(row, col) = divisor;
-//    (*this)[row*_cols+col] = (*this)(row, col)/divisor; //todo -changed from^
-//
-//  }
-//}
-//
-////helper
-//// פונקציה לחיסור שורות
-//void Matrix::subtract_rows(int target_row, int source_row, float
-//multiplier)
-//{
-//  for (int col = 0; col < _cols; ++col)
-//  {
-//    (*this)[target_row*_cols+col] = (*this)(target_row, col)-multiplier*
-//                                      (*this)(source_row, col);
-////    (*this)(targetRow, col) -= multiplier * (*this)(sourceRow, col); //todo -changed^
-//  }
-//}
-//
-//// מימוש rref בעזרת פונקציות העזר
-//Matrix Matrix::rref () const
-//{
-//  Matrix rref_m (*this);     //todo -call copy constructor?
-//  int lead = 0;
-//  for (int row = 0; row < _rows; ++row)
-//  {
-//    if (lead >= _cols)
-//    {
-//      return rref_m;
-//    }
-//
-//    int i = row;
-//    while (rref_m (i, lead) == 0)
-//    {
-//      ++i;
-//      if (i == _rows)
-//      {
-//        i = row;
-//        ++lead;
-//        if (lead == _cols)
-//        {
-//          return rref_m;
-//        }
-//      }
-//    }
-//
-//    rref_m.swap_rows (i, row);
-//
-//    if (rref_m (row, lead) != 0)
-//    {
-//      rref_m.divide_row (row, rref_m (row, lead));
-//    }
-//
-//    for (int index = 0; i < _rows; ++i)
-//    {
-//      if (index != row)
-//      {
-//        rref_m.subtract_rows(index, row, rref_m (index, lead));
-//      }
-//    }
-//    ++lead;
-//  }
-//  return rref_m;
-//}
-
-//*********
-
+/**
+ * Find the index of the maximum element.
+ * @return The index of the maximum element.
+ * @throw std::runtime_error If the matrix is empty.
+ */
 int Matrix::argmax () const
 {
-  if (_rows <= 0 || _cols <= 0) // todo - del?
+  if (_rows <= 0 || _cols <= 0)
   {
-    throw std::runtime_error ("Cannot find argmax of an empty matrix.");
+    throw std::runtime_error (CANNOT_FIND_ARGMAX);
   }
   int max_index = 0;
   for (int i = 0; i < _rows * _cols; i++)
@@ -339,8 +252,8 @@ int Matrix::argmax () const
 
 float Matrix::sum () const
 {
-  float total = 0; //todo -0.0f?
-  for (int i = 0; i < _rows * _cols; ++i)  //todo -i++?
+  float total = 0.0;
+  for (int i = 0; i < _rows * _cols; i++)
   {
     total += _data[i];
   }
@@ -348,31 +261,31 @@ float Matrix::sum () const
 }
 
 //operators:
-Matrix& Matrix::operator+= (const Matrix &m) //todo - validate cols==m_cols
+Matrix &Matrix::operator+= (const Matrix &m)
 {
   if (_rows != m._rows || _cols != m._cols)
   {
-    throw std::invalid_argument ("Matrix dimensions must agree for addition.");
+    throw std::invalid_argument (OUT_OF_RANGE);
   }
-  for (int i=0; i < _rows*_cols; i++)
+  for (int i = 0; i < _rows * _cols; i++)
   {
-    _data[i]+=m._data[i];
+    _data[i] += m._data[i];
   }
   return *this;
 }
 
-Matrix Matrix::operator+(const Matrix &m) const
+Matrix Matrix::operator+ (const Matrix &m) const
 {
   if (_rows != m._rows || _cols != m._cols)
   {
-    throw std::invalid_argument ("Matrix dimensions must agree for addition.");
+    throw std::invalid_argument (OUT_OF_RANGE);
   }
-  Matrix new_m(*this);
+  Matrix new_m (*this);
   new_m += m;
   return new_m;
 }
 
-Matrix& Matrix::operator=(const Matrix &m)
+Matrix &Matrix::operator= (const Matrix &m)
 {
   if (this == &m)
   {
@@ -381,131 +294,119 @@ Matrix& Matrix::operator=(const Matrix &m)
   delete[] _data;
   _rows = m._rows;
   _cols = m._cols;
-  _data = new float[_rows*_cols];
-  std::memcpy(_data, m._data, _rows * _cols * sizeof(float));
+  _data = new float[_rows * _cols];
+  std::memcpy (_data, m._data, _rows * _cols * sizeof (float));
   return *this;
 }
 
-Matrix Matrix::operator*(const Matrix &m) const
+Matrix Matrix::operator* (const Matrix &m) const
 {
   if (_cols != m._rows)
   {
-    throw std::invalid_argument("Matrix dimensions must agree for multiplication.");
+    throw std::invalid_argument (OUT_OF_RANGE);
   }
-  Matrix new_m(_rows, m._cols);
+  Matrix new_m (_rows, m._cols);
   for (int i = 0; i < new_m._rows; i++)
   {
     for (int j = 0; j < new_m._cols; j++)
     {
       for (int k = 0; k < _cols; k++)
       {
-        new_m[i*new_m._cols+j] += (*this)(i, k) * m(k, j);
-//        new_m(i, j) += (*this)(i, k) * m(k, j); //todo -changed^
+        new_m[i * new_m._cols + j] += (*this) (i, k) * m (k, j);
       }
     }
   }
   return new_m;
 }
 
-Matrix Matrix::operator*(float scalar) const
+Matrix Matrix::operator* (float scalar) const
 {
-  Matrix new_m(*this);
-  for (int i=0; i<_rows*_cols; i++)
+  Matrix new_m (*this);
+  for (int i = 0; i < _rows * _cols; i++)
   {
-    new_m._data[i] = _data[i]*scalar; //todo
+    new_m._data[i] = _data[i] * scalar;
   }
   return new_m;
 }
 
-
 // Operator * (scalar) friend
-Matrix operator*(float scalar, const Matrix &m)
+Matrix operator* (float scalar, const Matrix &m)
 {
   return m * scalar;
 }
 
-float& Matrix::operator()(int row, int col)  //todo - i added const retur
+float &Matrix::operator() (int row, int col)
 {
 
-  if (row<0 || col<0 ||  _rows <row || _cols < col) //todo - use get?
+  if (row < 0 || col < 0 || _rows < row || _cols < col)
   {
-    throw std::out_of_range("Matrix subscript out of bounds.");
-  }
-  return _data[row*_cols+ col];
-}
-
-
-float Matrix::operator()(int row, int col) const
-{
-  if (row >= _rows || col >= _cols)
-  {
-    throw std::out_of_range("Matrix subscript out of bounds.");
+    throw std::out_of_range (SUBSCRIPT_OUT_OF_BOUNDS);
   }
   return _data[row * _cols + col];
 }
 
-
-float& Matrix::operator[](int index)
+float Matrix::operator() (int row, int col) const
 {
-  if (index < 0 || index > _rows*_cols)
-//  if (index<0 || index> _rows*_cols) //todo - validate
+  if (row >= _rows || col >= _cols)
   {
-    throw std::out_of_range("Matrix subscript out of bounds.");
+    throw std::out_of_range (SUBSCRIPT_OUT_OF_BOUNDS);
   }
-//  for (int i=0; i<index)
-  return _data[index];
+  return _data[row * _cols + col];
 }
 
-float Matrix::operator[](int index) const
+float &Matrix::operator[] (int index)
 {
-  if (index<0 || index> _rows*_cols) //todo - validate
+  if (index < 0 || index > _rows * _cols)
   {
-    throw std::out_of_range("Matrix subscript out of bounds.");
+    throw std::out_of_range (SUBSCRIPT_OUT_OF_BOUNDS);
   }
   return _data[index];
 }
 
-std::ostream& operator<<(std::ostream &out, const Matrix &m)
+float Matrix::operator[] (int index) const
+{
+  if (index < 0 || index > _rows * _cols)
+  {
+    throw std::out_of_range (SUBSCRIPT_OUT_OF_BOUNDS);
+  }
+  return _data[index];
+}
+
+std::ostream &operator<< (std::ostream &out, const Matrix &m)
 {
   for (int i = 0; i < m._rows; ++i)
   {
     for (int j = 0; j < m._cols; ++j)
     {
-      if (m(i, j) > LIMIT)
-      {
-        out << "**";
-//        out << m(i, j) << "**";
-      }
+      if (m (i, j) > LIMIT)
+      { out << "**"; }
       else
-      {
-        out << " ";
-//        out << m(i, j) << "  ";
-      }
+      { out << " "; }
     }
     out << std::endl;
   }
   return out;
 }
 
-std::istream& operator>>(std::istream &in, Matrix &m)
+std::istream &operator>> (std::istream &in, Matrix &m)
 {
-  size_t array_size_bytes = m.get_rows() * m.get_cols() * sizeof(float);
-  char* stream_in = new char[array_size_bytes];
-  in.read(stream_in, array_size_bytes);
-  if (static_cast<size_t>(in.gcount()) != array_size_bytes)
+  size_t array_size_bytes = m.get_rows () * m.get_cols () * sizeof (float);
+  char *stream_in = new char[array_size_bytes];
+  in.read (stream_in, array_size_bytes);
+  if (static_cast<size_t>(in.gcount ()) != array_size_bytes)
   {
     delete[] stream_in;
-    throw std::runtime_error("Error: Input stream does not have enough data to fill the matrix.");
+    throw std::runtime_error (INVALID_DATA_SIZE);
   }
   int stream_i = 0;
-  for (int i = 0; i < m.get_rows(); i++)
+  for (int i = 0; i < m.get_rows (); i++)
   {
-    for (int j = 0; j < m.get_cols(); j++)
+    for (int j = 0; j < m.get_cols (); j++)
     {
       float val;
-      memcpy(&val, &stream_in[stream_i], sizeof(float));
-      m(i, j) = val;
-      stream_i += sizeof(float);
+      memcpy (&val, &stream_in[stream_i], sizeof (float));
+      m (i, j) = val;
+      stream_i += sizeof (float);
     }
   }
   // clean buffer

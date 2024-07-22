@@ -1,7 +1,5 @@
-// MlpNetwork.h
 #ifndef MLPNETWORK_H
 #define MLPNETWORK_H
-
 #include "Dense.h"
 
 #define MLP_SIZE 4
@@ -27,8 +25,6 @@ const matrix_dims bias_dims[] = {{128, 1},
 								 {64,  1},
 								 {20,  1},
 								 {10,  1}};
-
-// Insert MlpNetwork class here...
 
 class MlpNetwork{
  private:

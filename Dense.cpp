@@ -1,8 +1,6 @@
-//
-// Created by Owner on 18/07/2024.
-//
-
 #include "Dense.h"
+#define SUBSCRIPT_OUT_OF_BOUNDS "Matrix subscript out of bounds."
+#define NUM_VEC_COLS 1
 
 Dense::Dense(const Matrix &weights, const Matrix &bias,
              ActivationFunction activation_func):
@@ -12,11 +10,11 @@ Dense::Dense(const Matrix &weights, const Matrix &bias,
 {
   if (weights.get_rows() != bias.get_rows())
   {
-    throw std::out_of_range("Matrix subscript out of bounds.");
+    throw std::out_of_range(SUBSCRIPT_OUT_OF_BOUNDS);
   }
-  if (bias.get_cols() != 1)
+  if (bias.get_cols() != NUM_VEC_COLS)
   {
-    throw std::out_of_range("Matrix subscript out of bounds."); //todo-change
+    throw std::out_of_range(SUBSCRIPT_OUT_OF_BOUNDS);
   }
   _weights = weights;
   _bias = bias;
