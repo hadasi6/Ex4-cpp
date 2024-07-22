@@ -7,7 +7,7 @@
 
 Matrix activation::relu (const Matrix &m)
 {
-  Matrix new_m(m.get_rows(), m.get_rows());
+  Matrix new_m(m.get_rows(), m.get_cols());
   for (int i=0; i<new_m.get_rows()*new_m.get_cols();i++)
   {
     if (m[i]>=0)
