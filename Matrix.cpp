@@ -414,27 +414,3 @@ std::istream &operator>> (std::istream &in, Matrix &m)
   delete[] stream_in;
   return in;
 }
-
-//int _read_file_to_array(std::istream &is, float arr[], int n)
-//{
-//
-//  long int array_size_bytes = n * sizeof(float );
-//  is.seekg(0, std::ios_base::end);
-//  long file_size_bytes = (char)is.tellg ();
-//  if (file_size_bytes != array_size_bytes)
-//  {
-//    return BINARY_FILE_SIZE_FAILURE;
-//  }
-//  is.seekg (0, std::ios_base::beg);
-//  // advanced note: interpret_cast could be used here instead of (char*) but we didn't study it in class
-//  if (!is.read ((char *) arr, array_size_bytes))
-//  {
-//    return BINARY_READ_FAILURE;
-//  }
-//  is.close ();
-//  if (!is)
-//  {
-//    return BINARY_READ_FAILURE;
-//  }
-//  return BINARY_READ_SUCCESS;
-//}
