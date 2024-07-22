@@ -14,7 +14,8 @@
 #define DIMENSIONS_MUST_MATCH "Matrix dimensions must match for dot product."
 #define CANNOT_FIND_ARGMAX "Cannot find argmax of an empty matrix."
 #define SUBSCRIPT_OUT_OF_BOUNDS "Matrix subscript out of bounds."
-#define INVALID_DATA_SIZE "Input stream doesn't have enough data to fill the matrix."
+#define INVALID_DATA_SIZE "Input stream doesn't have enough data to fill the"\
+                            "matrix."
 #define INVALID_MATRIX_DIMENSIONS "Matrix dimensions must be positive."
 enum EnumBinaryReadResult
 {

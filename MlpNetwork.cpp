@@ -17,7 +17,8 @@ digit MlpNetwork::operator()(const Matrix& img) const
   {
     output=Dense(_weights[i], _biases[i], activation::relu)(output);
   }
-  output=Dense(_weights[MLP_SIZE-SHIFT], _biases[MLP_SIZE-SHIFT], activation::softmax)
+  output=Dense(_weights[MLP_SIZE-SHIFT], _biases[MLP_SIZE-SHIFT],
+               activation::softmax)
       (output);
   unsigned int result = output.argmax();
   float prob = output[(int)result];
