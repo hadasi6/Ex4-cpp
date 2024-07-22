@@ -156,55 +156,34 @@ float Matrix::norm () const
 }
 
 
-//void swap (float& a,float& b)
-//{
-//  float temp = a;
-//  a=b;
-//  b=temp;
-//}
-
-//helper
-// פונקציה להחלפת שורות
 void Matrix::swap_rows(int row1, int row2)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    float temp = _data[row1*_cols+ col];
-    (*this)[row1* _cols+ col]= (*this)(row2, col);
-    (*this)[row2*_cols+col] = temp;
-//    swap(m(row1, col), m(row2, col)); //todo - changed into 3 lines ^
+    std::swap((*this)(row1, col), (*this)(row2, col));
   }
 }
 
-//helper
-// פונקציה לחילוק שורה במספר מסוים
 void Matrix::divide_row(int row, float divisor)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    //    m(row, col) = divisor;
-    (*this)[row*_cols+col] = (*this)(row, col)/divisor; //todo -changed from^
-
+    (*this)(row, col) /= divisor;
   }
 }
 
-//helper
-// פונקציה לחיסור שורות
-void Matrix::subtract_rows(int target_row, int source_row, float
-multiplier)
+void Matrix::subtract_rows(int target_row, int source_row, float multiplier)
 {
   for (int col = 0; col < _cols; ++col)
   {
-    (*this)[target_row*_cols+col] = (*this)(target_row, col)-multiplier*
-                                      (*this)(source_row, col);
-//    (*this)(targetRow, col) -= multiplier * (*this)(sourceRow, col); //todo -changed^
+    (*this)(target_row, col) -= multiplier * (*this)(source_row, col);
   }
 }
 
-// מימוש rref בעזרת פונקציות העזר
-Matrix Matrix::rref () const
+
+Matrix Matrix::rref() const
 {
-  Matrix rref_m (*this);     //todo -call copy constructor?
+  Matrix rref_m(*this);
   int lead = 0;
   for (int row = 0; row < _rows; ++row)
   {
@@ -214,7 +193,7 @@ Matrix Matrix::rref () const
     }
 
     int i = row;
-    while (rref_m (i, lead) == 0)
+    while (rref_m(i, lead) == 0)
     {
       ++i;
       if (i == _rows)
@@ -228,24 +207,118 @@ Matrix Matrix::rref () const
       }
     }
 
-    rref_m.swap_rows (i, row);
+    rref_m.swap_rows(i, row);
 
-    if (rref_m (row, lead) != 0)
+    if (rref_m(row, lead) != 0)
     {
-      rref_m.divide_row (row, rref_m (row, lead));
+      rref_m.divide_row(row, rref_m(row, lead));
     }
 
-    for (int index = 0; i < _rows; ++i)
+    for (int index = 0; index < _rows; ++index)
     {
       if (index != row)
       {
-        rref_m.subtract_rows(index, row, rref_m (index, lead));
+        rref_m.subtract_rows(index, row, rref_m(index, lead));
       }
     }
     ++lead;
   }
   return rref_m;
 }
+
+
+//void swap (float& a,float& b)
+//{
+//  float temp = a;
+//  a=b;
+//  b=temp;
+//}
+//*****************
+//helper
+// פונקציה להחלפת שורות
+//void Matrix::swap_rows(int row1, int row2)
+//{
+//  for (int col = 0; col < _cols; ++col)
+//  {
+//    float temp = _data[row1*_cols+ col];
+//    (*this)[row1* _cols+ col]= (*this)(row2, col);
+//    (*this)[row2*_cols+col] = temp;
+////    swap(m(row1, col), m(row2, col)); //todo - changed into 3 lines ^
+//  }
+//}
+//
+////helper
+//// פונקציה לחילוק שורה במספר מסוים
+//void Matrix::divide_row(int row, float divisor)
+//{
+//  for (int col = 0; col < _cols; ++col)
+//  {
+//    //    m(row, col) = divisor;
+//    (*this)[row*_cols+col] = (*this)(row, col)/divisor; //todo -changed from^
+//
+//  }
+//}
+//
+////helper
+//// פונקציה לחיסור שורות
+//void Matrix::subtract_rows(int target_row, int source_row, float
+//multiplier)
+//{
+//  for (int col = 0; col < _cols; ++col)
+//  {
+//    (*this)[target_row*_cols+col] = (*this)(target_row, col)-multiplier*
+//                                      (*this)(source_row, col);
+////    (*this)(targetRow, col) -= multiplier * (*this)(sourceRow, col); //todo -changed^
+//  }
+//}
+//
+//// מימוש rref בעזרת פונקציות העזר
+//Matrix Matrix::rref () const
+//{
+//  Matrix rref_m (*this);     //todo -call copy constructor?
+//  int lead = 0;
+//  for (int row = 0; row < _rows; ++row)
+//  {
+//    if (lead >= _cols)
+//    {
+//      return rref_m;
+//    }
+//
+//    int i = row;
+//    while (rref_m (i, lead) == 0)
+//    {
+//      ++i;
+//      if (i == _rows)
+//      {
+//        i = row;
+//        ++lead;
+//        if (lead == _cols)
+//        {
+//          return rref_m;
+//        }
+//      }
+//    }
+//
+//    rref_m.swap_rows (i, row);
+//
+//    if (rref_m (row, lead) != 0)
+//    {
+//      rref_m.divide_row (row, rref_m (row, lead));
+//    }
+//
+//    for (int index = 0; i < _rows; ++i)
+//    {
+//      if (index != row)
+//      {
+//        rref_m.subtract_rows(index, row, rref_m (index, lead));
+//      }
+//    }
+//    ++lead;
+//  }
+//  return rref_m;
+//}
+
+//*********
 
 int Matrix::argmax () const
 {
