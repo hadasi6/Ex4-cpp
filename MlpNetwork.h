@@ -26,12 +26,17 @@ const matrix_dims bias_dims[] = {{128, 1},
 								 {20,  1},
 								 {10,  1}};
 
+//Represents a multi-layer perceptron (MLP) network used for digit
+//classification.
 class MlpNetwork{
  private:
-  Matrix _weights[MLP_SIZE];
-  Matrix _biases[MLP_SIZE];
+  Matrix _weights[MLP_SIZE]; //Array of weight matrices for each layer
+  Matrix _biases[MLP_SIZE];  //Array of bias matrices for each layer
  public:
+  //Constructs an MlpNetwork with the given weights and biases.
   MlpNetwork(const Matrix weights[MLP_SIZE], const Matrix biases[MLP_SIZE]);
+  //Classifies an input image and returns the identified digit with its
+  //probability.
   digit operator()(const Matrix& img) const;
 };
 

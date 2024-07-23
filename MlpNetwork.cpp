@@ -13,10 +13,13 @@ MlpNetwork::MlpNetwork (const Matrix *weights, const Matrix *biases)
 digit MlpNetwork::operator()(const Matrix& img) const
 {
   Matrix output=img;
+  //Forward pass through the network layers with ReLU activation for
+  // hidden layers
   for (int i=0; i<MLP_SIZE-SHIFT; i++)
   {
     output=Dense(_weights[i], _biases[i], activation::relu)(output);
   }
+  // Last layer with Softmax activation
   output=Dense(_weights[MLP_SIZE-SHIFT], _biases[MLP_SIZE-SHIFT],
                activation::softmax)
       (output);

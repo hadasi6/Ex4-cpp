@@ -70,10 +70,7 @@ int Matrix::get_cols () const
   return _cols;
 }
 
-/**
- * Transpose the matrix
- * @return Reference to the transposed matrix
- */
+
 Matrix &Matrix::transpose ()
 {
   // Allocate new memory for the transposed data
@@ -113,12 +110,6 @@ void Matrix::plain_print () const
   }
 }
 
-/**
- * Compute the dot product of two matrices
- * @param m Matrix to compute dot product with
- * @return A new matrix resulting from the dot product
- * @throw std::invalid_argument If matrix dimensions do not match
- */
 Matrix Matrix::dot (const Matrix &m) const
 {
   if (_rows != m._rows || _cols != m._cols)
@@ -143,11 +134,6 @@ float Matrix::norm () const
   return std::sqrt (elemnt_sum);
 }
 
-/**
- * Swap two rows in the matrix.
- * @param row1 The first row to swap.
- * @param row2 The second row to swap.
- */
 void Matrix::swap_rows (int row1, int row2)
 {
   for (int col = 0; col < _cols; ++col)
@@ -156,12 +142,6 @@ void Matrix::swap_rows (int row1, int row2)
   }
 }
 
-/**
- * Divide a row by a specified divisor.
- * @param row The row to divide.
- * @param divisor The number by which to divide the row.
- * @throw std::invalid_argument If divisor is zero.
- */
 void Matrix::divide_row (int row, float divisor)
 {
   for (int col = 0; col < _cols; ++col)
@@ -170,12 +150,6 @@ void Matrix::divide_row (int row, float divisor)
   }
 }
 
-/**
- * Subtract a multiple of one row from another row.
- * @param target_row The row to be modified.
- * @param source_row The row to subtract.
- * @param multiplier The multiplier to apply to the source row.
- */
 void Matrix::subtract_rows (int target_row, int source_row, float multiplier)
 {
   for (int col = 0; col < _cols; ++col)
@@ -184,10 +158,6 @@ void Matrix::subtract_rows (int target_row, int source_row, float multiplier)
   }
 }
 
-/**
- * Compute the Reduced Row Echelon Form (RREF) of the matrix.
- * @return A new matrix in RREF.
- */
 Matrix Matrix::rref () const
 {
   Matrix rref_m (*this);
@@ -229,11 +199,6 @@ Matrix Matrix::rref () const
   return rref_m;
 }
 
-/**
- * Find the index of the maximum element.
- * @return The index of the maximum element.
- * @throw std::runtime_error If the matrix is empty.
- */
 int Matrix::argmax () const
 {
   if (_rows <= 0 || _cols <= 0)
@@ -330,7 +295,6 @@ Matrix Matrix::operator* (float scalar) const
   return new_m;
 }
 
-// Operator * (scalar) friend
 Matrix operator* (float scalar, const Matrix &m)
 {
   return m * scalar;
@@ -393,7 +357,7 @@ std::istream &operator>> (std::istream &in, Matrix &m)
 {
   size_t array_size_bytes = m.get_rows () * m.get_cols () * sizeof (float);
   char *stream_in = new char[array_size_bytes];
-  in.read (stream_in, array_size_bytes);
+  in.read (stream_in, array_size_bytes); //todo- check if casting is needed
   if (static_cast<size_t>(in.gcount ()) != array_size_bytes)
   {
     delete[] stream_in;
@@ -410,7 +374,6 @@ std::istream &operator>> (std::istream &in, Matrix &m)
       stream_i += sizeof (float);
     }
   }
-  // clean buffer
-  delete[] stream_in;
+  delete[] stream_in; // clean buffer
   return in;
 }
