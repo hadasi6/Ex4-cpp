@@ -16,9 +16,6 @@ Dense::Dense(const Matrix &weights, const Matrix &bias,
   {
     throw std::out_of_range(SUBSCRIPT_OUT_OF_BOUNDS);
   }
-//  _weights = weights; //todo
-//  _bias = bias;
-//  _activation_func = activation_func;
 }
 
 Matrix Dense::get_weights() const

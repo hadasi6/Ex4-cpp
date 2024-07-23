@@ -357,7 +357,7 @@ std::istream &operator>> (std::istream &in, Matrix &m)
 {
   size_t array_size_bytes = m.get_rows () * m.get_cols () * sizeof (float);
   char *stream_in = new char[array_size_bytes];
-  in.read (stream_in, array_size_bytes); //todo- check if casting is needed
+  in.read (stream_in, static_cast<std::streamsize>(array_size_bytes));
   if (static_cast<size_t>(in.gcount ()) != array_size_bytes)
   {
     delete[] stream_in;
