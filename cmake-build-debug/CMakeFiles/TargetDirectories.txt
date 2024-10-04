@@ -1,0 +1,6 @@
+C:/Users/Owner/CLionProjects/ex4-hadas6/cmake-build-debug/CMakeFiles/ex4_hadas6.dir
+C:/Users/Owner/CLionProjects/ex4-hadas6/cmake-build-debug/CMakeFiles/test_31.dir
+C:/Users/Owner/CLionProjects/ex4-hadas6/cmake-build-debug/CMakeFiles/test_5.dir
+C:/Users/Owner/CLionProjects/ex4-hadas6/cmake-build-debug/CMakeFiles/test_12.dir
+C:/Users/Owner/CLionProjects/ex4-hadas6/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Owner/CLionProjects/ex4-hadas6/cmake-build-debug/CMakeFiles/rebuild_cache.dir
